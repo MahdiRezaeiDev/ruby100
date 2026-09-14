@@ -29,7 +29,7 @@
 {{-- Hero: full-bleed photo, brand-first, sharp utility CTAs --}}
 <section class="relative min-h-[100svh] overflow-hidden bg-ink">
     @if ($settings->heroImageUrl())
-        <img
+        <img loading="eager" fetchpriority="high" decoding="async" width="1600" height="1200"
             src="{{ $settings->heroImageUrl() }}"
             alt="Ruby100 tow truck roadside assistance in Melbourne"
             class="absolute inset-0 h-full w-full object-cover"
@@ -59,7 +59,7 @@
     <div class="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-4 font-display text-sm font-bold uppercase tracking-[0.2em] text-white sm:flex-row sm:justify-between md:px-8">
         <span>24/7 Dispatch</span>
         <span>Cash for Cars</span>
-        <span>Endeavour Hills · VIC</span>
+        <span>Endeavour Hills Â· VIC</span>
     </div>
 </section>
 
@@ -81,7 +81,7 @@
         </div>
         <div class="reveal d1 min-h-80 md:min-h-full">
             @if ($settings->aboutImageUrl())
-                <img
+                <img loading="lazy" decoding="async" width="1200" height="800"
                     src="{{ $settings->aboutImageUrl() }}"
                     alt="Ruby100 professional vehicle assistance"
                     class="h-full w-full object-cover"
@@ -107,7 +107,7 @@
                     </div>
                     <div class="md:col-span-3">
                         @if ($service->imageUrl())
-                            <img src="{{ $service->imageUrl() }}" alt="{{ $service->title }}" class="aspect-4/3 w-full object-cover">
+                            <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $service->imageUrl() }}" alt="{{ $service->title }}" class="aspect-4/3 w-full object-cover">
                         @endif
                     </div>
                     <div class="md:col-span-3">
@@ -154,7 +154,7 @@
         <div class="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
             @foreach ($gallery as $i => $image)
                 <figure class="reveal group relative overflow-hidden {{ $i === 0 ? 'col-span-2 aspect-16/10 md:row-span-2 md:aspect-auto md:h-full' : 'aspect-square' }}">
-                    <img
+                    <img loading="lazy" decoding="async" width="1200" height="800"
                         src="{{ $image->imageUrl() }}"
                         alt="{{ $image->caption ?: 'Ruby100 fleet' }}"
                         class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
@@ -213,7 +213,7 @@
         <div class="reveal d1 bg-white p-6 md:p-8">
             @if (session('quote_success'))
                 <div class="mb-5 border-l-4 border-wa bg-snow px-4 py-3 text-sm text-steel" role="status">
-                    Thanks — we’ve received your request and will be in touch shortly.
+                    Thanks â€” weâ€™ve received your request and will be in touch shortly.
                 </div>
             @endif
 
@@ -236,7 +236,7 @@
                 <label class="block text-xs font-bold uppercase tracking-wider text-mist">Service *
                     <select class="field mt-1" name="service" required>
                         <option value="" disabled @selected(! old('service'))>Select a service</option>
-                        @foreach (['Towing Services','Car Removal','Scrap Metal Collection','Emergency Assistance'] as $option)
+                        @foreach (['Towing Services','Car Removal','Scrap Metal Collection','Emergency Assistance','Machinery Transport'] as $option)
                             <option value="{{ $option }}" @selected(old('service') === $option)>{{ $option }}</option>
                         @endforeach
                     </select>
@@ -271,7 +271,7 @@
         <div class="reveal d1 bg-white p-6 text-ink">
             @if (session('cash_success'))
                 <div class="mb-4 border-l-4 border-wa px-4 py-3 text-sm" role="status">
-                    Request received — we’ll contact you with a cash offer soon.
+                    Request received â€” weâ€™ll contact you with a cash offer soon.
                 </div>
             @endif
             <form action="{{ route('cash.store') }}" method="POST" class="space-y-4">
@@ -283,7 +283,7 @@
                 <input class="field" type="text" name="name" placeholder="Your name *" required>
                 <input class="field" type="tel" name="phone" placeholder="Phone *" required>
                 <input class="field" type="email" name="email" placeholder="Email *" required>
-                <textarea class="field min-h-24" name="message" placeholder="Car make, model, year, condition…"></textarea>
+                <textarea class="field min-h-24" name="message" placeholder="Car make, model, year, conditionâ€¦"></textarea>
                 <button type="submit" class="btn-ink w-full">Get a Cash Offer</button>
             </form>
         </div>
@@ -300,12 +300,12 @@
             </div>
             <a href="{{ route('blog.index') }}" class="text-sm font-bold uppercase tracking-wide text-ruby hover:underline">View all</a>
         </div>
-        <div class="grid gap-8 md:grid-cols-3">
+        <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             @foreach ($posts as $post)
                 <a href="{{ route('blog.show', $post->slug) }}" class="reveal group block">
                     @if ($post->coverImageUrl())
                         <div class="aspect-16/10 overflow-hidden">
-                            <img src="{{ $post->coverImageUrl() }}" alt="{{ $post->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                            <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $post->coverImageUrl() }}" alt="{{ $post->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                         </div>
                     @endif
                     <h3 class="mt-4 font-display text-xl font-extrabold tracking-tight group-hover:text-ruby">{{ $post->title }}</h3>
@@ -317,3 +317,4 @@
 </section>
 @endif
 @endsection
+
