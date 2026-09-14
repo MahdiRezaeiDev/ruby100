@@ -18,7 +18,7 @@
             <a href="{{ route('blog.show', $post->slug) }}" class="group block">
                 @if ($post->coverImageUrl())
                     <div class="aspect-16/10 overflow-hidden">
-                        <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $post->coverImageUrl() }}" alt="{{ $post->title }}" class="h-full w-full object-cover transition group-hover:scale-105">
+                        <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $post->coverImageUrl() }}" srcset="{{ \App\Support\FleetImage::srcset($post->coverImageUrl()) }}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px" alt="{{ $post->title }}" class="h-full w-full object-cover transition group-hover:scale-105">
                     </div>
                 @endif
                 <p class="mt-4 text-xs font-bold uppercase tracking-wider text-mist">{{ optional($post->published_at)->format('d M Y') }}</p>

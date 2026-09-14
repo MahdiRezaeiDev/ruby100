@@ -8,7 +8,7 @@
 <article class="pt-28">
     @if ($post->coverImageUrl())
         <div class="mx-auto max-w-5xl px-5 md:px-8">
-            <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $post->coverImageUrl() }}" alt="{{ $post->title }}" class="aspect-21/9 w-full object-cover">
+            <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $post->coverImageUrl() }}" srcset="{{ \App\Support\FleetImage::srcset($post->coverImageUrl()) }}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px" alt="{{ $post->title }}" class="aspect-21/9 w-full object-cover">
         </div>
     @endif
     <div class="mx-auto max-w-3xl px-5 py-12 md:px-8">

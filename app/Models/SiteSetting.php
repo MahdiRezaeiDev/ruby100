@@ -77,6 +77,10 @@ class SiteSetting extends Model
             return $path;
         }
 
+        if (str_starts_with($path, '/images/fleet/')) {
+            return asset(ltrim($path, '/'));
+        }
+
         return Storage::disk('public')->url($path);
     }
 }

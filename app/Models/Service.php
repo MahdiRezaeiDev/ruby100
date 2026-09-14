@@ -40,6 +40,10 @@ class Service extends Model
             return $this->image;
         }
 
+        if (str_starts_with($this->image, '/images/fleet/')) {
+            return asset(ltrim($this->image, '/'));
+        }
+
         return Storage::disk('public')->url($this->image);
     }
 }

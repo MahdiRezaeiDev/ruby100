@@ -30,7 +30,7 @@
 <section class="relative min-h-[100svh] overflow-hidden bg-ink">
     @if ($settings->heroImageUrl())
         <img loading="eager" fetchpriority="high" decoding="async" width="1600" height="1200"
-            src="{{ $settings->heroImageUrl() }}"
+            src="{{ $settings->heroImageUrl() }}" srcset="{{ \App\Support\FleetImage::srcset($settings->heroImageUrl()) }}" sizes="100vw"
             alt="Ruby100 tow truck roadside assistance in Melbourne"
             class="absolute inset-0 h-full w-full object-cover"
         >
@@ -82,7 +82,7 @@
         <div class="reveal d1 min-h-80 md:min-h-full">
             @if ($settings->aboutImageUrl())
                 <img loading="lazy" decoding="async" width="1200" height="800"
-                    src="{{ $settings->aboutImageUrl() }}"
+                    src="{{ $settings->aboutImageUrl() }}" srcset="{{ \App\Support\FleetImage::srcset($settings->aboutImageUrl()) }}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
                     alt="Ruby100 professional vehicle assistance"
                     class="h-full w-full object-cover"
                 >
@@ -107,7 +107,7 @@
                     </div>
                     <div class="md:col-span-3">
                         @if ($service->imageUrl())
-                            <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $service->imageUrl() }}" alt="{{ $service->title }}" class="aspect-4/3 w-full object-cover">
+                            <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $service->imageUrl() }}" srcset="{{ \App\Support\FleetImage::srcset($service->imageUrl()) }}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px" alt="{{ $service->title }}" class="aspect-4/3 w-full object-cover">
                         @endif
                     </div>
                     <div class="md:col-span-3">
@@ -155,7 +155,7 @@
             @foreach ($gallery as $i => $image)
                 <figure class="reveal group relative overflow-hidden {{ $i === 0 ? 'col-span-2 aspect-16/10 md:row-span-2 md:aspect-auto md:h-full' : 'aspect-square' }}">
                     <img loading="lazy" decoding="async" width="1200" height="800"
-                        src="{{ $image->imageUrl() }}"
+                        src="{{ $image->imageUrl() }}" srcset="{{ \App\Support\FleetImage::srcset($image->imageUrl()) }}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
                         alt="{{ $image->caption ?: 'Ruby100 fleet' }}"
                         class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     >
@@ -305,7 +305,7 @@
                 <a href="{{ route('blog.show', $post->slug) }}" class="reveal group block">
                     @if ($post->coverImageUrl())
                         <div class="aspect-16/10 overflow-hidden">
-                            <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $post->coverImageUrl() }}" alt="{{ $post->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                            <img loading="lazy" decoding="async" width="1200" height="800" src="{{ $post->coverImageUrl() }}" srcset="{{ \App\Support\FleetImage::srcset($post->coverImageUrl()) }}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px" alt="{{ $post->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                         </div>
                     @endif
                     <h3 class="mt-4 font-display text-xl font-extrabold tracking-tight group-hover:text-ruby">{{ $post->title }}</h3>

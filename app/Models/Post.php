@@ -45,6 +45,10 @@ class Post extends Model
             return $this->cover_image;
         }
 
+        if (str_starts_with($this->cover_image, '/images/fleet/')) {
+            return asset(ltrim($this->cover_image, '/'));
+        }
+
         return Storage::disk('public')->url($this->cover_image);
     }
 }
