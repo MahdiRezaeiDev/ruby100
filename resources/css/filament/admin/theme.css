@@ -1,0 +1,36 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* Ruby100 admin + login branding */
+.fi-simple-layout {
+    background:
+        radial-gradient(ellipse 70% 45% at 0% 0%, rgb(200 16 46 / 0.18), transparent 55%),
+        radial-gradient(ellipse 55% 40% at 100% 100%, rgb(15 20 25 / 0.1), transparent 50%),
+        #f3f6f9 !important;
+}
+
+.fi-simple-main {
+    border: 1px solid #d7dee6 !important;
+    box-shadow: 0 24px 60px rgb(15 20 25 / 0.08) !important;
+}
+
+.fi-logo,
+.fi-simple-header {
+    justify-content: center;
+}
+
+.fi-simple-header-heading {
+    font-weight: 800 !important;
+    letter-spacing: -0.02em;
+}
+
+.fi-btn.fi-color-primary,
+.fi-btn-color-primary {
+    --tw-ring-color: rgb(200 16 46 / 0.35);
+}
+
+.fi-sidebar-header {
+    border-bottom: 1px solid rgb(200 16 46 / 0.15);
+}

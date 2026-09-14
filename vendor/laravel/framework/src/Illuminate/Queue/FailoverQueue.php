@@ -4,12 +4,21 @@ namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Events\QueueFailedOver;
+use Illuminate\Support\Collection;
 use RuntimeException;
 use Throwable;
 
 class FailoverQueue extends Queue implements QueueContract
 {
+    /**
+     * The queues which failed on the last action.
+     *
+     * @var list<string>
+     */
+    protected array $failingQueues = [];
+
     /**
      * Create a new failover queue instance.
      */
@@ -65,6 +74,69 @@ class FailoverQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the pending jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function pendingJobs($queue = null): Collection
+    {
+        return $this->manager->connection($this->connections[0])->pendingJobs($queue);
+    }
+
+    /**
+     * Get the delayed jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function delayedJobs($queue = null): Collection
+    {
+        return $this->manager->connection($this->connections[0])->delayedJobs($queue);
+    }
+
+    /**
+     * Get the reserved jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function reservedJobs($queue = null): Collection
+    {
+        return $this->manager->connection($this->connections[0])->reservedJobs($queue);
+    }
+
+    /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allPendingJobs(): Collection
+    {
+        return $this->manager->connection($this->connections[0])->allPendingJobs();
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return $this->manager->connection($this->connections[0])->allDelayedJobs();
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allReservedJobs(): Collection
+    {
+        return $this->manager->connection($this->connections[0])->allReservedJobs();
+    }
+
+    /**
      * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
      * @param  string|null  $queue
@@ -87,19 +159,7 @@ class FailoverQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        $lastException = null;
-
-        foreach ($this->connections as $connection) {
-            try {
-                return $this->manager->connection($connection)->push($job, $data, $queue);
-            } catch (Throwable $e) {
-                $lastException = $e;
-
-                $this->events->dispatch(new QueueFailedOver($connection, $job, $e));
-            }
-        }
-
-        throw $lastException ?? new RuntimeException('All failover queue connections failed.');
+        return $this->attemptOnAllConnections(__FUNCTION__, func_get_args(), $job);
     }
 
     /**
@@ -111,17 +171,7 @@ class FailoverQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $lastException = null;
-
-        foreach ($this->connections as $connection) {
-            try {
-                return $this->manager->connection($connection)->pushRaw($payload, $queue, $options);
-            } catch (Throwable $e) {
-                $lastException = $e;
-            }
-        }
-
-        throw $lastException ?? new RuntimeException('All failover queue connections failed.');
+        return $this->attemptOnAllConnections(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -135,19 +185,28 @@ class FailoverQueue extends Queue implements QueueContract
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        $lastException = null;
+        return $this->attemptOnAllConnections(__FUNCTION__, func_get_args(), $job);
+    }
 
-        foreach ($this->connections as $connection) {
-            try {
-                return $this->manager->connection($connection)->later($delay, $job, $data, $queue);
-            } catch (Throwable $e) {
-                $lastException = $e;
+    /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param  array  $jobs
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return void
+     */
+    public function bulk($jobs, $data = '', $queue = null)
+    {
+        foreach ((array) $jobs as $job) {
+            $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
 
-                $this->events->dispatch(new QueueFailedOver($connection, $job, $e));
+            if (isset($delay)) {
+                $this->later($delay, $job, $data, $queue);
+            } else {
+                $this->push($job, $data, $queue);
             }
         }
-
-        throw $lastException ?? new RuntimeException('All failover queue connections failed.');
     }
 
     /**
@@ -159,5 +218,38 @@ class FailoverQueue extends Queue implements QueueContract
     public function pop($queue = null)
     {
         return $this->manager->connection($this->connections[0])->pop($queue);
+    }
+
+    /**
+     * Attempt the given method on all connections.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    protected function attemptOnAllConnections(string $method, array $arguments, $job = null)
+    {
+        [$lastException, $failedQueues] = [null, []];
+
+        try {
+            foreach ($this->connections as $connection) {
+                try {
+                    return $this->manager->connection($connection)->{$method}(...$arguments);
+                } catch (Throwable $e) {
+                    $lastException = $e;
+
+                    $failedQueues[] = $connection;
+
+                    if ($job !== null && ! in_array($connection, $this->failingQueues)) {
+                        $this->events->dispatch(new QueueFailedOver($connection, $job, $e));
+                    }
+                }
+            }
+        } finally {
+            $this->failingQueues = $failedQueues;
+        }
+
+        throw $lastException ?? new RuntimeException('All failover queue connections failed.');
     }
 }

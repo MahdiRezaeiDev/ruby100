@@ -44,7 +44,7 @@ trait TestDatabases
         });
 
         ParallelTesting::setUpTestCase(function ($testCase) {
-            $uses = array_flip(class_uses_recursive(get_class($testCase)));
+            $uses = class_uses_recursive(get_class($testCase));
 
             $databaseTraits = [
                 Testing\DatabaseMigrations::class,
@@ -58,6 +58,10 @@ trait TestDatabases
                     [$testDatabase, $created] = $this->ensureTestDatabaseExists($database);
 
                     $this->switchToDatabase($testDatabase);
+
+                    if ($created) {
+                        ParallelTesting::callSetUpTestDatabaseBeforeMigratingCallbacks($testDatabase);
+                    }
 
                     if (isset($uses[Testing\DatabaseTransactions::class])) {
                         $this->ensureSchemaIsUpToDate();

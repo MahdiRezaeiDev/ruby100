@@ -1,3 +1,190 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-display: 'Syne', ui-sans-serif, sans-serif;
+    --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+
+    --color-ruby: #c8102e;
+    --color-ruby-deep: #8f0b20;
+    --color-ink: #0f1419;
+    --color-steel: #1c2733;
+    --color-mist: #5c6b7a;
+    --color-haze: #d7dee6;
+    --color-snow: #f3f6f9;
+    --color-white: #ffffff;
+    --color-wa: #087f46;
+    --color-wa-deep: #128c7e;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-snow font-sans text-ink antialiased;
+    }
+
+    ::selection {
+        background: color-mix(in oklab, var(--color-ruby) 30%, white);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-ruby);
+        outline-offset: 3px;
+    }
+}
+
+@layer components {
+    .font-display {
+        font-family: var(--font-display);
+    }
+
+    .site-nav {
+        transition:
+            background 0.3s ease,
+            box-shadow 0.3s ease,
+            color 0.3s ease;
+    }
+
+    /* Over dark hero: light text for contrast */
+    .site-nav .nav-brand,
+    .site-nav .nav-link {
+        color: #fff;
+        transition: color 0.3s ease;
+    }
+
+    .site-nav .nav-link:hover {
+        color: color-mix(in oklab, var(--color-ruby) 35%, white);
+    }
+
+    .site-nav .nav-menu-btn {
+        border-color: rgb(255 255 255 / 0.35);
+        color: #fff;
+    }
+
+    .site-nav.is-solid {
+        background: rgb(255 255 255 / 0.96);
+        box-shadow: 0 1px 0 var(--color-haze), 0 12px 40px rgb(15 20 25 / 0.06);
+        backdrop-filter: blur(12px);
+    }
+
+    .site-nav.is-solid .nav-brand {
+        color: var(--color-ink);
+    }
+
+    .site-nav.is-solid .nav-link {
+        color: var(--color-steel);
+    }
+
+    .site-nav.is-solid .nav-link:hover {
+        color: var(--color-ruby);
+    }
+
+    .site-nav.is-solid .nav-menu-btn {
+        border-color: var(--color-haze);
+        color: var(--color-ink);
+    }
+
+    .btn-ruby {
+        @apply inline-flex items-center justify-center rounded-none bg-ruby px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-ruby-deep;
+    }
+
+    .btn-ink {
+        @apply inline-flex items-center justify-center rounded-none bg-ink px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-steel;
+    }
+
+    .btn-wa {
+        @apply inline-flex items-center justify-center gap-2 rounded-none bg-wa px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-wa-deep;
+    }
+
+    .btn-ghost-light {
+        @apply inline-flex items-center justify-center rounded-none border border-white/40 bg-transparent px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-white hover:text-ink;
+    }
+
+    .field {
+        @apply w-full rounded-none border-0 border-b-2 border-haze bg-transparent px-0 py-3 text-ink transition placeholder:text-mist/70 focus:border-ruby focus:outline-none;
+    }
+
+    .reveal-pending {
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+            opacity 0.65s ease,
+            transform 0.65s ease;
+    }
+
+    .reveal.is-in {
+        opacity: 1;
+        transform: none;
+    }
+
+    .d1 {
+        transition-delay: 0.1s;
+    }
+    .d2 {
+        transition-delay: 0.2s;
+    }
+
+    @keyframes rise {
+        from {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    .rise {
+        animation: rise 0.8s ease both;
+    }
+
+    .r1 {
+        animation-delay: 0.05s;
+    }
+    .r2 {
+        animation-delay: 0.18s;
+    }
+    .r3 {
+        animation-delay: 0.3s;
+    }
+    .r4 {
+        animation-delay: 0.42s;
+    }
+
+    @keyframes pulse-soft {
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgb(37 211 102 / 0.45);
+        }
+        70% {
+            box-shadow: 0 0 0 14px rgb(37 211 102 / 0);
+        }
+    }
+
+    .wa-fab {
+        animation: pulse-soft 2.2s ease-out infinite;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .reveal,
+    .rise,
+    .wa-fab {
+        animation: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}

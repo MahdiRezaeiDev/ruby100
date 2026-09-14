@@ -5,13 +5,18 @@ namespace Illuminate\Queue;
 use Closure;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @mixin \Illuminate\Contracts\Queue\Queue
  */
 class QueueManager implements FactoryContract, MonitorContract
 {
+    use ResolvesQueueRoutes;
+
     /**
      * The application instance.
      *
@@ -121,25 +126,38 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Set the queue route for the given class.
+     *
+     * @param  array|class-string  $class
+     * @param  \UnitEnum|string|null  $queue
+     * @param  \UnitEnum|string|null  $connection
+     * @return void
+     */
+    public function route(array|string $class, $queue = null, $connection = null)
+    {
+        $this->queueRoutes()->set($class, $queue, $connection);
+    }
+
+    /**
      * Determine if the driver is connected.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return bool
      */
     public function connected($name = null)
     {
-        return isset($this->connections[$name ?: $this->getDefaultDriver()]);
+        return isset($this->connections[enum_value($name) ?: $this->getDefaultDriver()]);
     }
 
     /**
      * Resolve a queue connection instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connection($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = enum_value($name) ?: $this->getDefaultDriver();
 
         // If the connection has not been resolved yet we will resolve it now as all
         // of the connections are resolved when they are actually needed so we do
@@ -209,6 +227,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
+
+        $this->app['events']->dispatch(
+            new Events\QueuePaused($connection, $queue)
+        );
     }
 
     /**
@@ -224,6 +246,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
+
+        $this->app['events']->dispatch(
+            new Events\QueuePaused($connection, $queue, $ttl)
+        );
     }
 
     /**
@@ -238,6 +264,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->forget("illuminate:queue:paused:{$connection}:{$queue}");
+
+        $this->app['events']->dispatch(
+            new Events\QueueResumed($connection, $queue)
+        );
     }
 
     /**
@@ -252,6 +282,24 @@ class QueueManager implements FactoryContract, MonitorContract
         return (bool) $this->app['cache']
             ->store()
             ->get("illuminate:queue:paused:{$connection}:{$queue}", false);
+    }
+
+    /**
+     * Determine which of the given queues are currently paused.
+     *
+     * @param  string  $connection
+     * @param  array  $queues
+     * @return array
+     */
+    public function getPausedQueues($connection, $queues)
+    {
+        $keys = array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues);
+
+        $states = $this->app['cache']->store()->many($keys);
+
+        return array_values(array_filter(
+            $queues, fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false
+        ));
     }
 
     /**
@@ -319,12 +367,12 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Set the name of the default queue connection.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['queue.default'] = $name;
+        $this->app['config']['queue.default'] = enum_value($name);
     }
 
     /**
