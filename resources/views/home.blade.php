@@ -280,10 +280,10 @@
                     <input type="text" name="website" tabindex="-1" autocomplete="off">
                 </div>
                 <input type="hidden" name="service" value="Cash for Cars">
-                <input class="field" type="text" name="name" placeholder="Your name *" required>
-                <input class="field" type="tel" name="phone" placeholder="Phone *" required>
-                <input class="field" type="email" name="email" placeholder="Email *" required>
-                <textarea class="field min-h-24" name="message" placeholder="Car make, model, year, conditionâ€¦"></textarea>
+                <input class="field" type="text" name="name" aria-label="Your name" autocomplete="name" maxlength="120" placeholder="Your name *" required>
+                <input class="field" type="tel" name="phone" aria-label="Phone number" autocomplete="tel" maxlength="40" placeholder="Phone *" required>
+                <input class="field" type="email" name="email" aria-label="Email address" autocomplete="email" maxlength="180" placeholder="Email *" required>
+                <textarea class="field min-h-24" name="message" aria-label="Vehicle details" maxlength="2000" placeholder="Car make, model, year, conditionâ€¦"></textarea>
                 <button type="submit" class="btn-ink w-full">Get a Cash Offer</button>
             </form>
         </div>

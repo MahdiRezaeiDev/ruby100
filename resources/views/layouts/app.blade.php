@@ -19,9 +19,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="overflow-x-hidden bg-snow text-ink">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-white focus:p-4">Skip to content</a>
     @include('partials.nav')
 
-    <main>
+    <main id="main-content" tabindex="-1">
         @yield('content')
     </main>
 
