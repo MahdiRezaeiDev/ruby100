@@ -49,3 +49,15 @@ if ('IntersectionObserver' in window) {
 } else {
     reveals.forEach((el) => el.classList.add('is-in'))
 }
+
+document.querySelectorAll('[data-quote-service]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+        const select = document.getElementById('quote-service')
+        if (!select) return
+        event.preventDefault()
+        select.value = link.dataset.quoteService
+        select.dispatchEvent(new Event('change', { bubbles: true }))
+        window.location.hash = 'quote'
+        select.focus({ preventScroll: true })
+    })
+})

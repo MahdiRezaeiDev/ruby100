@@ -201,7 +201,7 @@
         <div class="reveal">
             <p class="text-xs font-bold uppercase tracking-[0.3em] text-ruby">Free Quote</p>
             <h2 class="mt-3 font-display text-4xl font-extrabold tracking-tight md:text-5xl">Send details. Get a clear answer.</h2>
-            <p class="mt-4 text-mist">Prefer chat? Message us on WhatsApp for the fastest reply.</p>
+            <p class="mt-4 text-mist">Choose a service below to request towing, car removal, machinery transport or a cash offer. Prefer chat? Message us on WhatsApp.</p>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                 @if ($settings->whatsappUrl())
                     <a href="{{ $settings->whatsappUrl() }}" target="_blank" rel="noopener noreferrer" class="btn-wa">WhatsApp {{ $settings->phone_display }}</a>
@@ -211,9 +211,9 @@
         </div>
 
         <div class="reveal d1 bg-white p-6 md:p-8">
-            @if (session('quote_success'))
+            @if (session('quote_success') || session('cash_success'))
                 <div class="mb-5 border-l-4 border-wa bg-snow px-4 py-3 text-sm text-steel" role="status">
-                    Thanks â€” weâ€™ve received your request and will be in touch shortly.
+                    Thanks! We have received your request and will be in touch shortly.
                 </div>
             @endif
 
@@ -234,10 +234,10 @@
                     <input class="field mt-1" type="email" name="email" value="{{ old('email') }}" required>
                 </label>
                 <label class="block text-xs font-bold uppercase tracking-wider text-mist">Service *
-                    <select class="field mt-1" name="service" required>
-                        <option value="" disabled @selected(! old('service'))>Select a service</option>
-                        @foreach (['Towing Services','Car Removal','Scrap Metal Collection','Emergency Assistance','Machinery Transport'] as $option)
-                            <option value="{{ $option }}" @selected(old('service') === $option)>{{ $option }}</option>
+                    <select class="field mt-1" name="service" id="quote-service" required>
+                        <option value="" disabled @selected(! old('service', request('service')))>Select a service</option>
+                        @foreach (['Towing Services','Car Removal','Scrap Metal Collection','Emergency Assistance','Machinery Transport','Cash for Cars'] as $option)
+                            <option value="{{ $option }}" @selected(old('service', request('service')) === $option)>{{ $option }}</option>
                         @endforeach
                     </select>
                 </label>
@@ -268,24 +268,9 @@
                 </a>
             @endif
         </div>
-        <div class="reveal d1 bg-white p-6 text-ink">
-            @if (session('cash_success'))
-                <div class="mb-4 border-l-4 border-wa px-4 py-3 text-sm" role="status">
-                    Request received â€” weâ€™ll contact you with a cash offer soon.
-                </div>
-            @endif
-            <form action="{{ route('cash.store') }}" method="POST" class="space-y-4">
-                @csrf
-                <div class="hidden" aria-hidden="true">
-                    <input type="text" name="website" tabindex="-1" autocomplete="off">
-                </div>
-                <input type="hidden" name="service" value="Cash for Cars">
-                <input class="field" type="text" name="name" aria-label="Your name" autocomplete="name" maxlength="120" placeholder="Your name *" required>
-                <input class="field" type="tel" name="phone" aria-label="Phone number" autocomplete="tel" maxlength="40" placeholder="Phone *" required>
-                <input class="field" type="email" name="email" aria-label="Email address" autocomplete="email" maxlength="180" placeholder="Email *" required>
-                <textarea class="field min-h-24" name="message" aria-label="Vehicle details" maxlength="2000" placeholder="Car make, model, year, conditionâ€¦"></textarea>
-                <button type="submit" class="btn-ink w-full">Get a Cash Offer</button>
-            </form>
+        <div class="reveal d1">
+            <p class="text-lg text-white/85">Tell us the make, model, year and condition of your car, plus the pickup suburb.</p>
+            <a href="{{ route('home', ['service' => 'Cash for Cars']) }}#quote" data-quote-service="Cash for Cars" class="btn-ink mt-6">Get a Cash Offer</a>
         </div>
     </div>
 </section>

@@ -14,7 +14,7 @@ class QuoteController extends Controller
 {
     public function store(Request $request): RedirectResponse
     {
-        return $this->persist($request, 'quote', 'quote_success');
+        return $this->persist($request, $request->input('service') === 'Cash for Cars' ? 'cash_for_cars' : 'quote', 'quote_success');
     }
 
     public function cashForCars(Request $request): RedirectResponse
@@ -60,7 +60,7 @@ class QuoteController extends Controller
 
         return redirect()
             ->route('home')
-            ->withFragment($type === 'cash_for_cars' ? 'cash-for-cars' : 'quote')
+            ->withFragment('quote')
             ->with($flashKey, true);
     }
 }
